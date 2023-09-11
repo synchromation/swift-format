@@ -35,12 +35,16 @@ let package = Package(
       targets: ["SwiftFormatConfiguration"]
     ),
     .plugin(
-      name: "FormatPlugin",
+      name: "FormatCommandPlugin",
       targets: ["Format Source Code"]
     ),
     .plugin(
-      name: "LintPlugin",
+      name: "LintCommandPlugin",
       targets: ["Lint Source Code"]
+    ),
+    .plugin(
+        name: "LintBuildPlugin",
+        targets: ["Lint Source Code in Build"]
     ),
   ],
   dependencies: [
@@ -82,20 +86,28 @@ let package = Package(
       dependencies: [
         .target(name: "swift-format")
       ],
-      path: "Plugins/FormatPlugin"
+      path: "Plugins/FormatCommandPlugin"
     ),
     .plugin(
-      name: "Lint Source Code",
-      capability: .command(
-        intent: .custom(
-          verb: "lint-source-code",
-          description: "Lint source code for a specified target."
-        )
-      ),
-      dependencies: [
-        .target(name: "swift-format")
-      ],
-      path: "Plugins/LintPlugin"
+        name: "Lint Source Code",
+        capability: .buildTool(),
+        dependencies: [
+            .target(name: "swift-format")
+        ],
+        path: "Plugins/LintCommandPlugin"
+    ),
+    .plugin(
+        name: "Lint Source Code in Build",
+        capability: .buildTool(),
+        dependencies: [
+            .target(name: "swift-format-binary")
+        ],
+        path: "Plugins/LintBuildPlugin"
+    ),
+    .binaryTarget(
+        name: "swift-format-binary",
+        url: "https://github.com/apple/swift-format/archive/refs/tags/508.0.1.zip",
+        checksum: "6fcb92283ecdd01d7b0ae1545e6270d00193612fcb46bfc6665c32286bce802a"
     ),
     .executableTarget(
       name: "generate-pipeline",
@@ -142,25 +154,25 @@ let package = Package(
 // MARK: Dependencies
 
 if ProcessInfo.processInfo.environment["SWIFTCI_USE_LOCAL_DEPS"] == nil {
-  // Building standalone.
-  package.dependencies += [
-    .package(
-      url: "https://github.com/apple/swift-argument-parser.git", 
-      from: "1.2.2"
-    ),
-    .package(
-      url: "https://github.com/apple/swift-markdown.git",
-      from: "0.2.0"
-    ),
-    .package(
-      url: "https://github.com/apple/swift-syntax.git",
-      branch: "main"
-    ),
-  ]
+    // Building standalone.
+    package.dependencies += [
+        .package(
+            url: "https://github.com/apple/swift-argument-parser.git",
+            from: "1.2.2"
+        ),
+        .package(
+            url: "https://github.com/apple/swift-markdown.git",
+            from: "0.2.0"
+        ),
+        .package(
+            url: "https://github.com/apple/swift-syntax.git",
+            branch: "main"
+        ),
+    ]
 } else {
-  package.dependencies += [
-    .package(path: "../swift-argument-parser"),
-    .package(path: "../swift-markdown"),
-    .package(path: "../swift-syntax"),
-  ]
+    package.dependencies += [
+        .package(path: "../swift-argument-parser"),
+        .package(path: "../swift-markdown"),
+        .package(path: "../swift-syntax"),
+    ]
 }

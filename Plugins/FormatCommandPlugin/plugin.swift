@@ -2,7 +2,7 @@ import PackagePlugin
 import Foundation
 
 @main
-struct FormatPlugin {
+struct FormatCommandPlugin {
   func format(tool: PluginContext.Tool, targetDirectories: [String], configurationFilePath: String?) throws {
     let swiftFormatExec = URL(fileURLWithPath: tool.path.string)
     
@@ -29,7 +29,7 @@ struct FormatPlugin {
   }
 }
 
-extension FormatPlugin: CommandPlugin {
+extension FormatCommandPlugin: CommandPlugin {
   func performCommand(
     context: PluginContext,
     arguments: [String]

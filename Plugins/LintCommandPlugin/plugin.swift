@@ -2,7 +2,7 @@ import PackagePlugin
 import Foundation
 
 @main
-struct LintPlugin {
+struct LintCommandPlugin {
   func lint(tool: PluginContext.Tool, targetDirectories: [String], configurationFilePath: String?) throws {
     let swiftFormatExec = URL(fileURLWithPath: tool.path.string)
     
@@ -29,7 +29,7 @@ struct LintPlugin {
   }
 }
 
-extension LintPlugin: CommandPlugin {
+extension LintCommandPlugin: CommandPlugin {
   func performCommand(
     context: PluginContext,
     arguments: [String]
